@@ -1,31 +1,43 @@
 import Stack from "./Stack";
+import deepCopy from "../helpers/deepCopy";
 
 class Tower {
-  constructor() {
-
+  constructor(maxLength) {
+    this.maxLength = maxLength;
+    this.length = 0;
+    this.disks = new Stack();
+  }
+  add(value) {
+    this.disks.push(value);
+    this.length++;
+    return this;
   }
 
-  add() {
-    
+  moveTopTo(destination) {
+    if (destination.add(this.disks.top.value)) {
+      this.disks.pop();
+      destination.setTower(deepCopy(destination));
+      this.setTower(deepCopy(this));
+      return this;
+    } else {
+      return false;
+    }
   }
 
-  moveTopTo() {
-    
-  }
-
-  moveDisks() {
-
+  *moveDisks(disks, towerDestination, towerAux) {
+    if (disks === 0) {
+      return true;
+    }
+    if (disks === 1) {
+      yield this.moveTopTo(towerDestination);
+    }
+    if (disks >= 2) {
+      yield* this.moveDisks(disks - 1, towerAux, towerDestination);
+      yield this.moveTopTo(towerDestination);
+      yield* towerAux.moveDisks(disks - 1, towerDestination, this);
+    }
+    return true;
   }
 }
-
-let  tower1 = new Tower ();
-let  tower2 = new Tower ();
-let  tower3 = new Tower ();
-
-tower1.add (3);
- tower1.add(2);
- tower1.add(1);
-
- console.log(JSON.stringify(tower1.moveDisks.top));
 
 export default Tower;
